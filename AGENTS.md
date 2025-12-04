@@ -1,3 +1,7 @@
+## Version Control with Jujutsu
+
+**IMPORTANT**: This project uses **jj (jujutsu)** for ALL version control. Git commands should instead use their equivalent Jujutsu commands. All changes should be created as single logical changes, not a series of commits. 
+
 ## Issue Tracking with bd (beads)
 
 **IMPORTANT**: This project uses **bd (beads)** for ALL issue tracking. Do NOT use markdown TODOs, task lists, or other tracking methods.
