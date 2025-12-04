@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="description" content="A 5x5 grid randomizer for creating permutations with touch controls">
+    <meta name="theme-color" content="#2c3e50">
+    <title>Grid Randomizer</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%232c3e50' width='100' height='100'/><rect fill='%2327ae60' x='10' y='10' width='80' height='80' rx='10'/></svg>">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #2c3e50;
+            --bg-secondary: #34495e;
+            --accent-primary: #27ae60;
+            --accent-secondary: #2ecc71;
+            --text-primary: #ecf0f1;
+            --text-secondary: #bdc3c7;
+            --border-color: #7f8c8d;
+            --disabled-bg: #95a5a6;
+            --disabled-text: #ecf0f1;
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            touch-action: manipulation;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: clamp(1.5rem, 5vw, 2rem);
+            margin-bottom: 0.5rem;
+        }
+
+        .instructions {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: clamp(0.875rem, 3vw, 1rem);
+            line-height: 1.5;
+        }
+
+        .grid-container {
+            aspect-ratio: 1;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(5, 1fr);
+            gap: 0.5rem;
+            width: 100%;
+            height: 100%;
+        }
+
+        .cell {
+            background: var(--bg-secondary);
+            border: 3px solid var(--border-color);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .cell:focus {
+            outline: 3px solid var(--accent-secondary);
+            outline-offset: 2px;
+        }
+
+        .cell:active {
+            transform: scale(0.95);
+        }
+
+        .cell.selected {
+            background: var(--accent-primary);
+            border-color: var(--accent-secondary);
+        }
+
+        .cell.disabled {
+            background: var(--disabled-bg);
+            color: var(--disabled-text);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .control-row {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .count-control {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .count-control label {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .count-control input[type="number"] {
+            width: 4rem;
+            padding: 0.5rem;
+            font-size: 1rem;
+            font-weight: bold;
+            border: 2px solid var(--border-color);
+            border-radius: 0.375rem;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        .count-control input[type="number"]:focus {
+            outline: 2px solid var(--accent-secondary);
+            outline-offset: 2px;
+            border-color: var(--accent-primary);
+        }
+
+        .checkbox-control {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .checkbox-control input[type="checkbox"] {
+            width: 1.25rem;
+            height: 1.25rem;
+            cursor: pointer;
+            accent-color: var(--accent-primary);
+        }
+
+        .checkbox-control label {
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        button {
+            background: var(--accent-primary);
+            color: var(--text-primary);
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.125rem;
+            font-weight: bold;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            touch-action: manipulation;
+            transition: all 0.2s ease;
+            min-height: 48px;
+            min-width: 200px;
+            box-shadow: 0 4px 6px var(--shadow);
+        }
+
+        button:hover {
+            background: var(--accent-secondary);
+        }
+
+        button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 4px var(--shadow);
+        }
+
+        button:focus {
+            outline: 3px solid var(--accent-secondary);
+            outline-offset: 4px;
+        }
+
+        button:disabled {
+            background: var(--disabled-bg);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .stats {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            padding: 0.5rem;
+        }
+
+        @media (max-width: 480px) {
+            .grid {
+                gap: 0.375rem;
+            }
+            
+            .cell {
+                border-width: 2px;
+            }
+            
+            button {
+                min-width: 160px;
+                padding: 0.875rem 1.5rem;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            .cell {
+                border-width: 4px;
+            }
+            
+            .cell.selected {
+                border-width: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Grid Randomizer</h1>
+            <p class="instructions">
+                Tap squares to select them, then press Randomize to create a random permutation.
+                Tap numbered squares to toggle them on/off.
+            </p>
+        </header>
+
+        <div class="grid-container">
+            <div class="grid" id="grid" role="grid" aria-label="5x5 selection grid"></div>
+        </div>
+
+        <div class="controls">
+            <div class="control-row">
+                <div class="count-control">
+                    <label for="count-input">Count:</label>
+                    <input 
+                        type="number" 
+                        id="count-input" 
+                        min="1" 
+                        max="25" 
+                        value="5"
+                        aria-label="Number of squares to select"
+                    >
+                </div>
+                <div class="checkbox-control">
+                    <input 
+                        type="checkbox" 
+                        id="show-numbers-checkbox" 
+                        aria-label="Show numbers on squares"
+                    >
+                    <label for="show-numbers-checkbox">Show numbers</label>
+                </div>
+                <button id="randomize-btn" aria-label="Randomize selected squares">
+                    Randomize
+                </button>
+            </div>
+            <div class="stats" id="stats" aria-live="polite"></div>
+        </div>
+    </div>
+
+    <script>
+        const GRID_SIZE = 5;
+        const STORAGE_KEY = 'grid-randomizer-state';
+
+        class GridRandomizer {
+            constructor() {
+                this.grid = Array(GRID_SIZE * GRID_SIZE).fill(null).map(() => ({
+                    selected: false,
+                    number: null
+                }));
+                this.selectionCount = 5; // Default to 5 squares
+                this.showNumbers = false; // Default to not showing numbers
+                this.gridElement = document.getElementById('grid');
+                this.randomizeBtn = document.getElementById('randomize-btn');
+                this.countInput = document.getElementById('count-input');
+                this.showNumbersCheckbox = document.getElementById('show-numbers-checkbox');
+                this.statsElement = document.getElementById('stats');
+                
+                this.init();
+            }
+
+            init() {
+                const hasState = this.loadState();
+                if (!hasState) {
+                    this.randomInitialSelection();
+                }
+                this.render();
+                this.attachEventListeners();
+                this.updateStats();
+                this.registerServiceWorker();
+            }
+
+            loadState() {
+                try {
+                    const saved = localStorage.getItem(STORAGE_KEY);
+                    if (saved) {
+                        const state = JSON.parse(saved);
+                        if (Array.isArray(state) && state.length === this.grid.length) {
+                            this.grid = state;
+                            return true;
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Failed to load state:', e);
+                }
+                return false;
+            }
+
+            randomInitialSelection() {
+                // Select N random squares on initial load
+                const indices = Array.from({ length: GRID_SIZE * GRID_SIZE }, (_, i) => i);
+                this.shuffleArray(indices);
+                
+                for (let i = 0; i < this.selectionCount; i++) {
+                    this.grid[indices[i]].selected = true;
+                }
+                
+                this.saveState();
+            }
+
+            saveState() {
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(this.grid));
+                } catch (e) {
+                    console.warn('Failed to save state:', e);
+                }
+            }
+
+            render() {
+                this.gridElement.innerHTML = '';
+                
+                this.grid.forEach((cell, index) => {
+                    const cellElement = document.createElement('div');
+                    cellElement.className = 'cell';
+                    cellElement.setAttribute('role', 'gridcell');
+                    cellElement.setAttribute('tabindex', '0');
+                    cellElement.setAttribute('aria-label', `Cell ${index + 1}`);
+                    
+                    if (cell.number !== null) {
+                        // Only show number if showNumbers is true
+                        if (this.showNumbers) {
+                            cellElement.textContent = cell.number;
+                        }
+                        cellElement.classList.add('selected');
+                        const label = this.showNumbers 
+                            ? `Cell ${index + 1}, number ${cell.number}` 
+                            : `Cell ${index + 1}, selected`;
+                        cellElement.setAttribute('aria-label', label);
+                        cellElement.setAttribute('aria-pressed', 'true');
+                    } else if (cell.selected) {
+                        cellElement.classList.add('selected');
+                        cellElement.setAttribute('aria-pressed', 'true');
+                    } else {
+                        cellElement.setAttribute('aria-pressed', 'false');
+                    }
+                    
+                    cellElement.addEventListener('click', () => this.toggleCell(index));
+                    cellElement.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            this.toggleCell(index);
+                        }
+                    });
+                    
+                    this.gridElement.appendChild(cellElement);
+                });
+            }
+
+            toggleCell(index) {
+                const cell = this.grid[index];
+                
+                if (cell.number !== null) {
+                    // If cell has a number, toggle it back to selected (unnumbered)
+                    cell.number = null;
+                    cell.selected = true;
+                } else {
+                    // Toggle selection
+                    cell.selected = !cell.selected;
+                }
+                
+                this.saveState();
+                this.render();
+                this.updateStats();
+            }
+
+            randomize() {
+                // Always select exactly N random squares
+                const indices = Array.from({ length: GRID_SIZE * GRID_SIZE }, (_, i) => i);
+                this.shuffleArray(indices);
+                
+                // Create numbers for the selection count
+                const numbers = Array.from({ length: this.selectionCount }, (_, i) => i + 1);
+                this.shuffleArray(numbers);
+
+                // Reset all cells
+                this.grid.forEach(cell => {
+                    cell.number = null;
+                    cell.selected = false;
+                });
+
+                // Assign random numbers to N random cells
+                for (let i = 0; i < this.selectionCount; i++) {
+                    this.grid[indices[i]].number = numbers[i];
+                    this.grid[indices[i]].selected = true;
+                }
+
+                this.saveState();
+                this.render();
+                this.updateStats();
+            }
+
+            shuffleArray(array) {
+                // Fisher-Yates shuffle
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+            }
+
+            updateStats() {
+                const selectedCount = this.grid.filter(cell => cell.selected || cell.number !== null).length;
+                const numberedCount = this.grid.filter(cell => cell.number !== null).length;
+                
+                if (numberedCount > 0) {
+                    this.statsElement.textContent = `${numberedCount} cells randomized`;
+                } else if (selectedCount > 0) {
+                    this.statsElement.textContent = `${selectedCount} cells selected`;
+                } else {
+                    this.statsElement.textContent = 'Select cells to begin';
+                }
+            }
+
+            attachEventListeners() {
+                this.randomizeBtn.addEventListener('click', () => this.randomize());
+                this.countInput.addEventListener('change', () => this.updateSelectionCount());
+                this.countInput.addEventListener('input', () => this.updateSelectionCount());
+                this.showNumbersCheckbox.addEventListener('change', () => this.toggleShowNumbers());
+            }
+
+            updateSelectionCount() {
+                const value = parseInt(this.countInput.value, 10);
+                if (value >= 1 && value <= 25) {
+                    this.selectionCount = value;
+                } else {
+                    // Reset to valid value if out of range
+                    this.countInput.value = this.selectionCount;
+                }
+            }
+
+            toggleShowNumbers() {
+                this.showNumbers = this.showNumbersCheckbox.checked;
+                this.render();
+            }
+
+            async registerServiceWorker() {
+                if ('serviceWorker' in navigator) {
+                    try {
+                        await navigator.serviceWorker.register('sw.js');
+                        console.log('Service Worker registered');
+                    } catch (e) {
+                        console.warn('Service Worker registration failed:', e);
+                    }
+                }
+            }
+        }
+
+        // Initialize the app
+        const app = new GridRandomizer();
+    </script>
+</body>
+</html>
