@@ -1,15 +1,27 @@
 const CACHE_NAME = 'grid-randomizer-v1';
-const ASSETS = [
-    './',
-    './index.html',
-    './manifest.json'
-];
+
+// Dynamically determine base path from service worker scope
+const getBasePath = () => {
+    const scope = self.registration.scope;
+    const url = new URL(scope);
+    return url.pathname;
+};
+
+// Get assets with proper base path
+const getAssets = () => {
+    const basePath = getBasePath();
+    return [
+        basePath,
+        `${basePath}index.html`,
+        `${basePath}manifest.json`
+    ];
+};
 
 // Install event - cache assets
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME)
-            .then(cache => cache.addAll(ASSETS))
+            .then(cache => cache.addAll(getAssets()))
             .then(() => self.skipWaiting())
     );
 });
@@ -54,8 +66,9 @@ self.addEventListener('fetch', (event) => {
                 });
             })
             .catch(() => {
-                // Return a basic offline page if available
-                return caches.match('./index.html');
+                // Return index.html for offline fallback
+                const basePath = getBasePath();
+                return caches.match(`${basePath}index.html`);
             })
     );
 });

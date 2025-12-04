@@ -2,7 +2,7 @@
   "name": "Grid Randomizer",
   "short_name": "Grid Randomizer",
   "description": "A 5x5 grid randomizer for creating permutations with touch controls",
-  "start_url": ".",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#2c3e50",
   "theme_color": "#2c3e50",
