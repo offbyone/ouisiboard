@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <meta name="description" content="A 5x5 grid randomizer for creating permutations with touch controls">
-    <meta name="theme-color" content="#2c3e50">
-    <title>Grid Randomizer</title>
+    <meta name="description" content="Digital board for OuiSi Capture - a collaborative photo card game where you find connections">
+    <meta name="theme-color" content="#f5f1ed">
+    <title>OuiSi Board</title>
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/png" sizes="192x192" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%232c3e50' width='100' height='100'/><rect fill='%2327ae60' x='10' y='10' width='80' height='80' rx='10'/></svg>">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23f5f1ed' width='100' height='100'/><rect fill='%238b7355' x='10' y='10' width='80' height='80' rx='12' stroke='%23a68968' stroke-width='2'/></svg>">
     
     <style>
         * {
@@ -17,16 +17,16 @@
         }
 
         :root {
-            --bg-primary: #2c3e50;
-            --bg-secondary: #34495e;
-            --accent-primary: #27ae60;
-            --accent-secondary: #2ecc71;
-            --text-primary: #ecf0f1;
-            --text-secondary: #bdc3c7;
-            --border-color: #7f8c8d;
-            --disabled-bg: #95a5a6;
-            --disabled-text: #ecf0f1;
-            --shadow: rgba(0, 0, 0, 0.3);
+            --bg-primary: #f5f1ed;
+            --bg-secondary: #ffffff;
+            --accent-primary: #8b7355;
+            --accent-secondary: #a68968;
+            --text-primary: #3d3935;
+            --text-secondary: #6b6460;
+            --border-color: #d4ccc4;
+            --disabled-bg: #c9c1b9;
+            --disabled-text: #6b6460;
+            --shadow: rgba(61, 57, 53, 0.15);
         }
 
         body {
@@ -74,15 +74,15 @@
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             grid-template-rows: repeat(5, 1fr);
-            gap: 0.5rem;
+            gap: 0.75rem;
             width: 100%;
             height: 100%;
         }
 
         .cell {
             background: var(--bg-secondary);
-            border: 3px solid var(--border-color);
-            border-radius: 0.5rem;
+            border: 2px solid var(--border-color);
+            border-radius: 0.75rem;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -93,6 +93,17 @@
             transition: all 0.2s ease;
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
+            box-shadow: 0 2px 8px var(--shadow), 0 1px 3px rgba(0, 0, 0, 0.06);
+            position: relative;
+        }
+        
+        .cell::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 0.75rem;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 50%);
+            pointer-events: none;
         }
 
         .cell:focus {
@@ -107,6 +118,9 @@
         .cell.selected {
             background: var(--accent-primary);
             border-color: var(--accent-secondary);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(139, 115, 85, 0.3), 0 2px 4px rgba(0, 0, 0, 0.08);
+            transform: translateY(-2px);
         }
 
         .cell.disabled {
@@ -260,10 +274,10 @@
 <body>
     <div class="container">
         <header>
-            <h1>Grid Randomizer</h1>
+            <h1>OuiSi Board</h1>
             <p class="instructions">
-                Tap squares to select them, then press Randomize to create a random permutation.
-                Tap numbered squares to toggle them on/off.
+                Playing OuiSi Capture? Use this board to randomly select 5 cards from your 5×5 photo grid.
+                Give one-word clues and find beautiful connections together.
             </p>
         </header>
 
