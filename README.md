@@ -2,6 +2,8 @@
 
 A progressive web app for creating random permutations of selected spaces in a 5x5 grid.
 
+**Live Demo**: https://offbyone.github.io/ouisiboard/
+
 ## Features
 
 - **5x5 Interactive Grid**: Tap to select/deselect squares
@@ -21,15 +23,32 @@ A progressive web app for creating random permutations of selected spaces in a 5
 
 ## Deployment
 
+This application is automatically deployed to GitHub Pages at https://offbyone.github.io/ouisiboard/
+
+### Automated Deployment (GitHub Actions)
+
+The repository includes a GitHub Actions workflow that automatically deploys to GitHub Pages on every push to the `main` branch.
+
+**Setup Steps**:
+1. Ensure GitHub Pages is enabled in repository settings
+2. Go to Settings > Pages
+3. Set Source to "GitHub Actions"
+4. The workflow at `.github/workflows/deploy.yml` will handle deployment
+
+**Workflow triggers**:
+- Automatic: Every push to `main` branch
+- Manual: Use "workflow_dispatch" in GitHub Actions tab
+
+### Manual Deployment
+
 This is a static web application. Deploy the following files to any static hosting service:
 
 - `index.html` - Main application file
 - `manifest.json` - PWA manifest
 - `sw.js` - Service worker for offline support
 
-### Hosting Options
+### Alternative Hosting Options
 
-- **GitHub Pages**: Upload to a repository and enable GitHub Pages
 - **Netlify**: Drag and drop the files to Netlify
 - **Vercel**: Deploy from a git repository or CLI
 - **Any static host**: Apache, Nginx, S3, etc.
